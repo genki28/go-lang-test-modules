@@ -8,6 +8,13 @@ RUN mkdir /go/src/app
 WORKDIR /go/src/app
 # ホストのファイルをコンテナの作業ディレクトリに移行
 ADD . /go/src/app
-# CMD ["go", "run", "main.go"]
-RUN go get github.com/oxequa/realize
+# ENV GO111MODULE=on
+
+COPY go.mod ./
+
+RUN go mod download
+
+COPY . .
+
+RUN go get -u github.com/oxequa/realize
 CMD ["realize", "start", "--run"]
