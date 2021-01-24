@@ -6,6 +6,11 @@ import (
 	"html/template"
 	"net/http"
 	"time"
+	"encoding/json"
+	"fmt"
+	"html"
+
+	// "github.com/genki28/app/cloud_functions"
 )
 
 func loadTemplate(name string) *template.Template {
@@ -38,8 +43,25 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// HelloHTTP is an HTTP Cloud Function with a request parameter.
+func HelloHTTP(w http.ResponseWriter, r *http.Request) {
+        var d struct {
+                Name string `json:"name"`
+        }
+        if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
+                fmt.Fprint(w, "Hello, World!")
+                return
+        }
+        if d.Name == "" {
+                fmt.Fprint(w, "Hello, World!")
+                return
+        }
+        fmt.Fprintf(w, "Hello, %s!", html.EscapeString(d.Name))
+}
+
 func main() {
 	http.HandleFunc("/", testHandler)
+	// http.HandleFunc("/cloudFunctions", cloud_functions.HelloHttp)
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
